@@ -13,4 +13,4 @@ ros2 pkg create --build-type ament_cmake ros2pcl_test --dependencies rclcpp std_
 ```
 
 - --build-type : 빌드 시스템 설정
-	- ament_cmake : catkin의 업그레이드 버전
+  - ament_cmake : catkin의 업그레이드 버전
