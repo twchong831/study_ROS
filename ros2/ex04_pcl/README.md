@@ -1,5 +1,7 @@
 # ROS2 with PCL
 
+* 구동 환경 ubuntu로 변경
+
 ## install
 
 ```bash
