@@ -1,4 +1,5 @@
-// #include "rosNode/rosNode.h"
+#ifndef __ROSNODE_H__
+#define __ROSNODE_H__
 
 #include <iostream>
 #include <stdio.h>
@@ -39,18 +40,11 @@ private:
 		PointCloudT::Ptr points_(new PointCloudT);
 		PointT pt_;
 
-		int size_ = 10;
-
-		if(cnt_%2 != 0)
+		for (uint x = 0; x < 10; x++)
 		{
-			size_ = 20;
-		}
-
-		for (uint x = 0; x < size_; x++)
-		{
-			for (uint y = 0; y < size_; y++)
+			for (uint y = 0; y < 10; y++)
 			{
-				for (uint z = 0; z < size_; z++)
+				for (uint z = 0; z < 10; z++)
 				{
 					if (cnt_ % 2 == 0)
 					{
@@ -77,7 +71,7 @@ private:
 		}
 
 		cnt_++;
-		if (cnt_ > 10)
+		if (cnt_ > 0)
 		{
 			cnt_ = 0;
 		}
@@ -89,7 +83,6 @@ private:
 	{
 		auto laser2pc = generatePointCloud();
 		auto pc_msg = convertPointCloud2Msg(laser2pc);
-		RCLCPP_INFO(rclcpp::get_logger("ros2pclTest"), "MSG Size : %d -> %d", laser2pc->size(), pc_msg.data.size());
 		pc_pub_->publish(pc_msg);
 	}
 
@@ -125,16 +118,6 @@ public:
 
 		cnt_ = 0;
 	}
-	// ~rosNode();
+	~rosNode();
 };
-
-int main(int argc, char **argv)
-{
-	rclcpp::init(argc, argv);
-	// RCLCPP_INFO(rclcpp::get_logger("ros2pclTest"), "Hello, World");
-
-	rclcpp::spin(std::make_shared<rosNode>());
-
-	rclcpp::shutdown();
-	return 0;
-}
+#endif // __ROSNODE_H__

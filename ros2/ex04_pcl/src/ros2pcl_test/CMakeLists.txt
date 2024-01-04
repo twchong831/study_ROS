@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.8)
 project(ros2pcl_test)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  add_compile_options(-Wall -Wextra -Wpedantic)
+	add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
 # find dependencies
@@ -13,6 +13,10 @@ find_package(sensor_msgs REQUIRED)
 find_package(PCL 1.12 REQUIRED)
 find_package(pcl_conversions REQUIRED)
 # find_package(pcl_apps-1.12 REQUIRED)
+
+# add_subdirectory(${CMAKE_SOURCE_DIR}/include/rosNode)
+
+# include_directories(${CMAKE_SOURCE_DIR}/include)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -32,7 +36,7 @@ endif()
 
 add_executable(ros2pcl_test src/main.cpp)
 
-ament_target_dependencies(ros2pcl_test rclcpp)
+ament_target_dependencies(ros2pcl_test rclcpp pcl_conversions)
 target_link_libraries( ros2pcl_test ${PCL_LIBRARIES} )
 
 install(TARGETS ros2pcl_test
