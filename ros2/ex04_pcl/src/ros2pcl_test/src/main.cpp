@@ -26,14 +26,29 @@ class rosNode : public rclcpp::Node
 {
 private:
 	// FUNC.
+	
+	/// @brief convert pcl::PointCloud to sensor_msgs::msg::PointCloud2
+	/// @param points_ pcl::PointCloud<pcl::PointXYZRGB>::Ptr
+	/// @return sensor::msgs::msg::PointCloud2
 	sensor_msgs::msg::PointCloud2 convertPointCloud2Msg(PointCloudT::Ptr points_)
 	{
 		sensor_msgs::msg::PointCloud2 msg;
+
+		// convert pointcloud to ros2 msg
 		pcl::toROSMsg(*points_, msg);
+
+		// set ros2 msg frame ID
+		msg.header.set__frame_id("map");	// rviz의 fixed frame를 따라가야함
+		// rclcpp::Time now = this->get_clock()->now();
+
+		// set ros2 msg timestamp
+		msg.header.set__stamp(this->get_clock()->now());
 
 		return msg;
 	}
 
+	/// @brief generate example Pointcloud
+	/// @return 
 	PointCloudT::Ptr generatePointCloud()
 	{
 		PointCloudT::Ptr points_(new PointCloudT);
@@ -85,23 +100,36 @@ private:
 		return points_;
 	}
 
+	/// @brief func. using timer
 	void timer_callback()
 	{
+		// generate example pointcloud
 		auto laser2pc = generatePointCloud();
+
+		// convert pointcloud to ros2 msg format
 		auto pc_msg = convertPointCloud2Msg(laser2pc);
-		RCLCPP_INFO(rclcpp::get_logger("ros2pclTest"), "MSG Size : %d -> %d", laser2pc->size(), pc_msg.data.size());
+
+		// log : check pointcloud size & ros2 msg data size
+		RCLCPP_INFO(rclcpp::get_logger(pc_pub_->get_topic_name()), "MSG Size : %d -> %d", laser2pc->size(), pc_msg.data.size());
+
+		// log : check ros2 msg header : frame ID 
+		RCLCPP_INFO(rclcpp::get_logger(pc_pub_->get_topic_name()), "Chekc MSG HEADER - Frame ID : %s", pc_msg.header.frame_id.c_str());
+		
+		// log : check ros2 msg header : timestamp 
+		RCLCPP_INFO(rclcpp::get_logger(pc_pub_->get_topic_name()), "Chekc MSG HEADER - TimeStamp : %u.%u sec", pc_msg.header.stamp.sec, pc_msg.header.stamp.nanosec);
+
+		// publish ros2 msg for pointcloud
 		pc_pub_->publish(pc_msg);
 	}
 
 	/* data */
-	std::vector<float> robot_pose_;
+	// pointcloud
 	PointCloudT::Ptr pointcloud_;
-	// std::vector<float> scan_data_;
 
-	std_msgs::msg::Header cur_header;
-	float r_max;
-
+	// ros2 msg publisher
 	rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pc_pub_;
+
+	// ros2 timer
 	rclcpp::TimerBase::SharedPtr timer_;
 
 	int cnt_;
@@ -109,18 +137,16 @@ private:
 public:
 	rosNode(/* args */) : rclcpp::Node("kanvi_hlk_sub")
 	{
-		robot_pose_.resize(3);
+		// set QoS method
+		auto qos_profile = rclcpp::QoS(rclcpp::KeepLast(10));
+		// auto qos_profile2 = rclcpp::QoS(rclcpp::SystemDefaultsQoS);
 
-		// subscription data at odom and laser
-		std::function<void(const nav_msgs::msg::Odometry::SharedPtr)> odom_callback = [this](const nav_msgs::msg::Odometry::SharedPtr _odom) -> void
-		{
-			robot_pose_[0] = _odom->pose.pose.position.x;
-			robot_pose_[1] = _odom->pose.pose.position.y;
-			robot_pose_[2] = _odom->pose.pose.position.z;
-		};
+		// define publisher
+		// set topic name & QoS method
+		pc_pub_ = this->create_publisher<sensor_msgs::msg::PointCloud2>("points", qos_profile);
 
-		pc_pub_ = this->create_publisher<sensor_msgs::msg::PointCloud2>("myPC", 10);
-
+		// define timer
+		// timer activate every 30ms
 		timer_ = this->create_wall_timer(30ms, std::bind(&rosNode::timer_callback, this));
 
 		cnt_ = 0;
@@ -131,10 +157,8 @@ public:
 int main(int argc, char **argv)
 {
 	rclcpp::init(argc, argv);
-	// RCLCPP_INFO(rclcpp::get_logger("ros2pclTest"), "Hello, World");
-
 	rclcpp::spin(std::make_shared<rosNode>());
-
 	rclcpp::shutdown();
+
 	return 0;
 }

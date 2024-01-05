@@ -12,10 +12,8 @@ find_package(std_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(PCL 1.12 REQUIRED)
 find_package(pcl_conversions REQUIRED)
-# find_package(pcl_apps-1.12 REQUIRED)
 
 # add_subdirectory(${CMAKE_SOURCE_DIR}/include/rosNode)
-
 # include_directories(${CMAKE_SOURCE_DIR}/include)
 
 if(BUILD_TESTING)
