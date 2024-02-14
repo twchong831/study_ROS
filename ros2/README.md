@@ -155,7 +155,7 @@ ros2 pkg create --build-type ament_cmake [package-name]
 
 ```bash
 cd [project-dir]
-rosdep install -i -from-path src --rosdistro humble -y
+rosdep install -i --from-path src --rosdistro humble -y
 colcon build --packages-select cpp_pubsub
 # zsh install/setup.zsh
 ./install/setup.sh
@@ -181,7 +181,7 @@ ros2 pkg create --build-type ament_cmake cpp_srvcli --dependencies rclcpp exampl
 
 ```bash
 # path : project/
-rosdep install -i -from-path src --rosdistro --humble -y
+rosdep install -i --from-path src --rosdistro --humble -y
 colcon build --package-select cpp_srvcli
 # colcon build --packages-select cpp_srvcli --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release # when cannot found package using "ros2 run"
 ```
@@ -227,7 +227,7 @@ ros2 run cpp_srvcli client 2 3
 #### build
 
 ```bash
-rosdep install -i -from-path src --rosdistro --humble -y
+rosdep install -i --from-path src --rosdistro --humble -y
 colcon build --package-select cpp_parameters
 # colcon build --packages-select cpp_parameters --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release # when cannot found package using "ros2 run"
 ```
